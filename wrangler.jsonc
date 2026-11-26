@@ -11,8 +11,7 @@
     {
       "binding": "DB",
       "database_name": "my-agentai-app-db",
-      // Cloudflare 대시보드 > D1에서 만든 DB의 ID로 바꾸세요.
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      // database_id 없음: 첫 배포 때 Wrangler가 이 이름으로 D1을 자동으로 만들고 연결합니다.
       "migrations_dir": "migrations"
     }
   ]

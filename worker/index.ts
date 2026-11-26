@@ -6,7 +6,15 @@ interface Env { DB: D1Database; ASSETS: Fetcher }
 const json = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
+// 테이블이 없으면 만듭니다 (migrations/0001_init.sql과 같은 내용). 인스턴스마다 한 번만 실행.
+let schemaReady: Promise<unknown> | null = null;
+const ensureSchema = (env: Env) =>
+  (schemaReady ??= env.DB.prepare(
+    "CREATE TABLE IF NOT EXISTS planners (id text PRIMARY KEY NOT NULL, payload text NOT NULL, revision integer DEFAULT 0 NOT NULL)"
+  ).run().catch((e) => { schemaReady = null; throw e; }));
+
 async function ucsbPlanner(request: Request, env: Env) {
+  try { await ensureSchema(env); } catch { return json({ error: "DB를 준비하지 못했습니다." }, 500); }
   if (request.method === "GET") {
     try {
       const row = await env.DB.prepare("SELECT payload, revision FROM planners WHERE id = 'main'").first<{ payload: string; revision: number }>();

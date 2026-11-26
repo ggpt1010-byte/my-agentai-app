@@ -30,14 +30,13 @@ npm run check           # 계산 검증 24개
 npm run build           # 타입 검사 + 빌드
 ```
 
-## 처음 한 번 설정 (Cloudflare)
+## 배포 (Cloudflare Workers Builds)
 
-1. 대시보드 > Storage & Databases > D1 > Create: 이름 `my-agentai-app-db`. 생성된 Database ID를 `wrangler.jsonc`의 `database_id`에 넣습니다.
-2. 대시보드 > My Profile > API Tokens > Create Token > "Edit Cloudflare Workers" 템플릿 + 권한에 **D1: Edit** 추가.
-3. GitHub 저장소 > Settings > Secrets and variables > Actions 에 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` 등록.
-4. 첫 배포 후 Zero Trust > Access > Applications > Self-hosted 로 `my-agentai-app.<계정>.workers.dev` 전체를 보호하고, 정책에 본인 이메일만 허용.
+Cloudflare 대시보드에서 이 GitHub 저장소를 Worker `my-agentai-app`에 직접 연결했습니다. `main`에 push하면 Cloudflare가 `npm run build` → `npx wrangler deploy`를 실행합니다.
 
-**Access 설정 전에는 주소를 아는 누구나 데이터를 볼 수 있습니다.** API 자체에는 로그인 기능이 없습니다.
+- D1 `my-agentai-app-db`는 첫 배포 때 Wrangler가 자동으로 만들고, 테이블은 Worker가 첫 요청 때 만듭니다.
+- 접근 보호: Cloudflare Access(본인 계정만 허용). **API 자체에는 로그인 기능이 없으니 Access를 끄지 마세요.**
+- `.github/workflows/deploy.yml`은 예비용 수동 배포입니다(API 토큰 비밀값 필요).
 
 ## 기존 사이트 데이터 옮기기
 
